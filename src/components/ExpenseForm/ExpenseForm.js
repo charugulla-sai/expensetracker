@@ -1,12 +1,24 @@
-import React, { useEffect, useRef } from "react";
-import styles from "./ExpenseForm.module.css";
+import React, { useEffect, useRef } from 'react';
+import styles from './ExpenseForm.module.css';
 
-const ExpenseForm = ({ addExpense }) => {
+const ExpenseForm = ({
+  addExpense,
+  expenseToUpdate,
+  updateExpenses,
+  removeExpenseToUpdate,
+}) => {
   const expenseTextInput = useRef();
   const expenseAmountInput = useRef();
 
   // Use the useEffect hook here, to check if an expense is to be updated
   // If yes, the autofill the form values with the text and amount of the expense
+
+  useEffect(() => {
+    if (expenseToUpdate) {
+      expenseTextInput.current.value = expenseToUpdate.text;
+      expenseAmountInput.current.value = expenseToUpdate.amount;
+    }
+  }, [expenseToUpdate]);
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
@@ -19,18 +31,28 @@ const ExpenseForm = ({ addExpense }) => {
     const expense = {
       text: expenseText,
       amount: expenseAmount,
-      id: new Date().getTime()
+      id: new Date().getTime(),
     };
-    addExpense(expense);
-    clearInput();
-    return;
 
     // Logic to update expense here
+    if (expenseToUpdate) {
+      const updatedExpense = {
+        text: expenseText,
+        amount: expenseAmount,
+        id: expenseToUpdate.id,
+      };
+      updateExpenses(expenseToUpdate.id, updatedExpense);
+      removeExpenseToUpdate(null);
+    } else {
+      addExpense(expense);
+    }
+    clearInput();
+    return;
   };
 
   const clearInput = () => {
-    expenseAmountInput.current.value = "";
-    expenseTextInput.current.value = "";
+    expenseAmountInput.current.value = '';
+    expenseTextInput.current.value = '';
   };
 
   return (
